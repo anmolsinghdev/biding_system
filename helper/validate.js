@@ -1,13 +1,18 @@
-const customerrorhandler = require("../middlewares/customErrorHandler");
+const { createuserschema, createitemschema } = require("./validate_schema");
 
-const { createuserschema } = require("./validate_schema");
-module.exports = {
-  userauth: async (req, res, next) => {
-    const value = await createuserschema.validate(req.body);
-    if (value.error) {
-      next(customerrorhandler.validateError(401));
-    } else {
-      next();
-    }
-  },
+exports.userauth = async (req, res, next) => {
+  const value = await createuserschema.validate(req.body);
+  if (value.error) {
+    return next(value.error);
+  } else {
+    next();
+  }
+};
+exports.itemauth = async (req, res, next) => {
+  const value = await createitemschema.validate(req.body);
+  if (value.error) {
+    return next(value.error);
+  } else {
+    next();
+  }
 };

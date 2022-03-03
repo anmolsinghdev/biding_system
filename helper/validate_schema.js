@@ -7,7 +7,8 @@ exports.createuserschema = joi.object({
 });
 exports.createitemschema = joi.object({
   itemName: joi.string().required(),
-  itemCategory: joi.string().email().required(),
-  price: joi.string().required(),
-  itemStartingBid: joi.string().required(),
+  itemCategory: joi.string().required(),
+  price: joi.number().required(),
+  itemStartingBid: joi.number().required(),
+  CurrentBid: joi.array(),
 });

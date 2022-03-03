@@ -6,22 +6,22 @@ const ObjectId = mongoose.Types.ObjectId;
 exports.createUser = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
-    if (UserModel.exists({ email: email })) {
-      // res.json({
-      //   error: "err",
-      // });
-      return next(CustomErrorHandler.validateError());
-    } else {
-      const data = await UserModel.create({
-        username: username,
-        email: email,
-        password: password,
-      });
-      res.json({
-        status: "Success",
-        data: data,
-      });
+    const checkUserExists = await UserModel.exists({
+      username: username,
+    });
+
+    if (checkUserExists) {
+      return next(CustomErrorHandler.alreadyExists("Already Username Exists"));
     }
+    const data = await UserModel.create({
+      username: username,
+      email: email,
+      password: password,
+    });
+    res.json({
+      status: "Success",
+      data: data,
+    });
   } catch (err) {
     return next(err);
   }
