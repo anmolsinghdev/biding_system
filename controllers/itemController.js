@@ -81,9 +81,11 @@ exports.bidOnItem = async (req, res, next) => {
     } else {
       res.json({
         success: false,
-        itemStartingBid: checker[0].itemStartingBid,
-        LastBidPrice: checker[0].CurrentBid,
-        error: "Please Enter More Bid then Last Bid Price ",
+        BidPrice:
+          length === 0
+            ? checker[0].itemStartingBid
+            : checker[0].CurrentBid[length - 1].bid,
+        error: "Please Enter More Bid Price ",
       });
     }
   } catch (err) {
