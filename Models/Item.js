@@ -18,12 +18,7 @@ const ItemSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    CurrentBid: [
-      {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "users",
-      },
-    ],
+    CurrentBid: { type: Array },
   },
   { timestamps: true }
 );

@@ -3,6 +3,8 @@ const mongoose = require("mongoose");
 const CustomErrorHandler = require("../middlewares/customErrorHandler");
 const ObjectId = mongoose.Types.ObjectId;
 
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 exports.createUser = async (req, res, next) => {
   try {
     const { username, email, password } = req.body;
@@ -19,7 +21,7 @@ exports.createUser = async (req, res, next) => {
       password: password,
     });
     res.json({
-      status: "Success",
+      Success: true,
       data: data,
     });
   } catch (err) {
@@ -60,26 +62,6 @@ exports.showalluser = async (req, res, next) => {
   }
 };
 
-// exports.showalluser = async (req, res, next) => {
-//   try {
-//     // const data = await UserModel.find({});
-//     const data = await UserModel.aggregate([
-//       {
-//         $project: {
-//           _id: "$$REMOVE",
-//         },
-//       },
-//     ]);
-
-//     res.json({
-//       status: "Success",
-//       data: data,
-//     });
-//   } catch (err) {
-//     return next(err);
-//   }
-// };
-
 exports.showOneuser = async (req, res, next) => {
   try {
     const id = req.params.id;
@@ -111,30 +93,27 @@ exports.showOneuser = async (req, res, next) => {
   }
 };
 
-// exports.showOneuser = async (req, res, next) => {
-//   try {
-//     const id = req.params.id;
-//     const data = await UserModel.aggregate([
-//       { $match: { _id: ObjectId(id) } },
-//       {
-//         $lookup: {
-//           from: "items",
-//         },
-//       },
-//       // { $project: { email: 1, _id: 0 } },
-//       // {
-//       // $unionWith: {
-//       //   coll: "items",
-//       //   pipeline: [{ $project: { itemName: 1, _id: 0 } }],
-//       // },
-//       // },
-//     ]);
+exports.userLogin = async (req, res, next) => {
+  try {
+    const { username: inputUsername, password: inputPassword } = req.body;
+    const data = await UserModel.find({
+      username: inputUsername,
+    });
+    if (data[0].password === inputPassword) {
+      const jwtSign = jwt.sign(
+        { username: inputUsername, id: data[0].id },
+        process.env.SECRET_KEY
+      );
 
-//     res.json({
-//       status: "Success",
-//       data: data,
-//     });
-//   } catch (err) {
-//     return next(err);
-//   }
-// };
+      res.json({
+        success: true,
+        data: data,
+        jwtSign: jwtSign,
+      });
+    } else {
+      next(CustomErrorHandler.notFound("check Username & Password"));
+    }
+  } catch (err) {
+    return next(err);
+  }
+};
