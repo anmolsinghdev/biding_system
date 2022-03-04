@@ -54,8 +54,6 @@ exports.bidOnItem = async (req, res, next) => {
     const { username, id } = jwt.verify(token, process.env.SECRET_KEY);
     const checker = await itemModel.find({ _id: bidingItemId });
     const length = checker[0].CurrentBid.length;
-    // console.log("length", length);
-    // console.log(checker[0].CurrentBid[length - 1].bid);
 
     if (length === 0) {
       const data = await itemModel.findByIdAndUpdate(
