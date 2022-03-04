@@ -55,7 +55,7 @@ exports.bidOnItem = async (req, res, next) => {
     const checker = await itemModel.find({ _id: bidingItemId });
     const length = checker[0].CurrentBid.length;
 
-    if (length === 0) {
+    if (length === 0 && CurrentBid > checker[0].itemStartingBid) {
       const data = await itemModel.findByIdAndUpdate(
         { _id: bidingItemId },
         { $push: { CurrentBid: { userid: id, bid: CurrentBid } } },
@@ -65,7 +65,10 @@ exports.bidOnItem = async (req, res, next) => {
         success: true,
         data: data,
       });
-    } else if (CurrentBid > checker[0].CurrentBid[length - 1].bid) {
+    } else if (
+      CurrentBid > checker[0].itemStartingBid &&
+      CurrentBid > checker[0].CurrentBid[length - 1].bid
+    ) {
       const data = await itemModel.findByIdAndUpdate(
         { _id: bidingItemId },
         { $push: { CurrentBid: { userid: id, bid: CurrentBid } } },
@@ -78,7 +81,9 @@ exports.bidOnItem = async (req, res, next) => {
     } else {
       res.json({
         success: false,
-        result: "Please Enter More Bid then Previous Bid",
+        itemStartingBid: checker[0].itemStartingBid,
+        LastBidPrice: checker[0].CurrentBid,
+        error: "Please Enter More Bid then Last Bid Price ",
       });
     }
   } catch (err) {
