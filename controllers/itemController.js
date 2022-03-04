@@ -85,7 +85,7 @@ exports.bidOnItem = async (req, res, next) => {
           length === 0
             ? checker[0].itemStartingBid
             : checker[0].CurrentBid[length - 1].bid,
-        error: "Please Enter More Bid Price ",
+        error: "Please Enter More Than BidPrice ",
       });
     }
   } catch (err) {
