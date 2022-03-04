@@ -52,15 +52,37 @@ exports.bidOnItem = async (req, res, next) => {
     const authHeader = req.headers.authorization;
     const token = authHeader.split(" ")[1];
     const { username, id } = jwt.verify(token, process.env.SECRET_KEY);
-    const data = await itemModel.findByIdAndUpdate(
-      { _id: bidingItemId },
-      { $push: { CurrentBid: { userid: username, bid: CurrentBid } } },
-      { new: true }
-    );
-    res.json({
-      success: true,
-      data: data,
-    });
+    const checker = await itemModel.find({ _id: bidingItemId });
+    const length = checker[0].CurrentBid.length;
+    // console.log("length", length);
+    // console.log(checker[0].CurrentBid[length - 1].bid);
+
+    if (length === 0) {
+      const data = await itemModel.findByIdAndUpdate(
+        { _id: bidingItemId },
+        { $push: { CurrentBid: { userid: id, bid: CurrentBid } } },
+        { new: true }
+      );
+      res.json({
+        success: true,
+        data: data,
+      });
+    } else if (CurrentBid > checker[0].CurrentBid[length - 1].bid) {
+      const data = await itemModel.findByIdAndUpdate(
+        { _id: bidingItemId },
+        { $push: { CurrentBid: { userid: id, bid: CurrentBid } } },
+        { new: true }
+      );
+      res.json({
+        success: true,
+        data: data,
+      });
+    } else {
+      res.json({
+        success: false,
+        result: "Please Enter More Bid then Previous Bid",
+      });
+    }
   } catch (err) {
     return next(err);
   }
